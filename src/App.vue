@@ -1,28 +1,29 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <ImageEdit
+      width='800'
+      height='800'
+    />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import ImageEdit from '@/components/ImageEdit'
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    ImageEdit
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  *{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  canvas{
+    display: block;
+  }
 </style>
