@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <ImageEdit
+    <ImageGraffiti
       width='800'
       height='800'
     />
@@ -8,11 +8,11 @@
 </template>
 
 <script>
-import ImageEdit from '@/components/ImageEdit'
+import ImageGraffiti from '@/components/ImageGraffiti'
 export default {
   name: 'App',
   components: {
-    ImageEdit
+    ImageGraffiti
   }
 }
 </script>
@@ -22,6 +22,7 @@ export default {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    list-style: none;
   }
   canvas{
     display: block;
