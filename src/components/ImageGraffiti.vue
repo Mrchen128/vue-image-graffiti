@@ -13,7 +13,7 @@
             @mousedown='cmousedown'
             v-show="originImg"
             :class="{
-              'text-mode':mode === 'text'
+              'text-mode':mode === 'text',
             }"
         ></canvas>
         <div class="add-img" v-if="!originImg">
@@ -40,6 +40,7 @@
             <li
               class="base-btn text-edit"
               @click="handleLine"
+              title="画笔"
               :class="{
                 active:mode === 'line'
               }"
@@ -57,9 +58,14 @@
                     </li>
                 </ul>
             </li>
-            <li class="base-btn text-edit" @click="handleEdit" :class="{
-              active:mode === 'text'
-            }">
+            <li
+              class="base-btn text-edit"
+              @click="handleEdit"
+              title="文字"
+              :class="{
+                active:mode === 'text'
+              }"
+            >
             T
                <ul class="text-style-handle-list" v-if="mode ==='text'" @click.stop>
                  <li class="select">
@@ -77,10 +83,18 @@
                  </li>
                </ul>
             </li>
-             <li class="base-btn" title='后退'>
+             <li class="base-btn" title='箭头'
+              @click="handleArrow"
+              :class="{
+                active:mode === 'arrow'
+              }"
+            >
+                <i class="el-icon-top-right"></i>
+            </li>
+             <li class="base-btn" title='撤销'>
                 <i class="el-icon-back"></i>
             </li>
-            <li class="base-btn export" title='导出' @click='onExport'>
+            <li class="base-btn export" title='保存' @click='onExport'>
                 <i class="el-icon-download"></i>
             </li>
         </ul>
@@ -88,6 +102,13 @@
 </template>
 
 <script>
+const CONST = {
+  edgeLen: 50,
+  angle: 25
+}
+const beginPoint = {};
+const stopPoint = {};
+const polygonVertex = [];
 export default {
   data () {
     return {
@@ -96,7 +117,7 @@ export default {
       ctx: null,
       lineWidth: 1,
       strokeStyle: 'rgba(255, 69, 0, 0.68)',
-      mode: '',
+      mode: '', // line text arrow
       textBoxRect: null,
       textValue: '',
       fontSize: 24,
@@ -117,7 +138,14 @@ export default {
       fontBaseConfig: {
         textBaseline: 'top',
         textAlign: 'left'
-      }
+      },
+      arrowInitPosi: { // 鼠标mousedown的位置坐标
+        x: 0,
+        y: 0
+      },
+      angle: '',
+      history: [],
+      isDrawing: false
     };
   },
   props: {
@@ -174,16 +202,30 @@ export default {
       }
       image.src = url;
     },
-    cmousemove (e) {
+    lmousemove (e) {
       const disX = e.clientX - this.canvas.offsetLeft;
       const disY = e.clientY - this.canvas.offsetTop;
       // 移动时设置画线的结束位置。并且显示
       this.ctx.lineTo(disX, disY) // 鼠标点下去的位置
       this.ctx.stroke()
     },
-    cmouseup () {
-      document.removeEventListener('mousemove', this.cmousemove);
-      document.removeEventListener('mouseup', this.cmouseup);
+    lmouseup () {
+      document.removeEventListener('mousemove', this.lmousemove);
+      document.removeEventListener('mouseup', this.lmouseup);
+    },
+    amousemove (e) {
+    },
+    amouseup (e) {
+      const disX = e.clientX - this.canvas.offsetLeft;
+      const disY = e.clientY - this.canvas.offsetTop;
+      stopPoint.x = disX;
+      stopPoint.y = disY;
+      // alert(stopPoint.x+"+"+stopPoint.y);
+      this.arrowCoord(beginPoint, stopPoint);
+      this.sideCoord();
+      this.drawArrow();
+      document.removeEventListener('mousemove', this.amousemove);
+      document.removeEventListener('mouseup', this.amouseup);
     },
     cmousedown (e) {
       // 计算鼠标在画布的距离
@@ -206,8 +248,14 @@ export default {
         this.ctx.strokeStyle = this.strokeStyle;
         // 设置画的起始点
         this.ctx.moveTo(disX, disY)
-        document.addEventListener('mousemove', this.cmousemove);
-        document.addEventListener('mouseup', this.cmouseup);
+        document.addEventListener('mousemove', this.lmousemove);
+        document.addEventListener('mouseup', this.lmouseup);
+      } else if (this.mode === 'arrow') {
+        beginPoint.x = disX;
+        beginPoint.y = disY;
+        this.ctx.moveTo(disX, disY);
+        document.addEventListener('mousemove', this.amousemove);
+        document.addEventListener('mouseup', this.amouseup);
       }
     },
     textValueInput (e) {
@@ -249,6 +297,15 @@ export default {
         this.mode = '';
       } else {
         this.mode = 'line';
+        this.textBoxRect = null;
+      }
+    },
+    handleArrow () {
+      if (this.mode === 'arrow') {
+        this.mode = '';
+      } else {
+        this.mode = 'arrow';
+        this.textBoxRect = null;
       }
     },
     onExport () {
@@ -257,6 +314,74 @@ export default {
       a.href = url;
       a.download = '导出';
       a.click();
+    },
+    // 箭头
+    dynArrowSize: function () {
+      var x = stopPoint.x - beginPoint.x;
+      var y = stopPoint.y - beginPoint.y;
+      var length = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+      if (length < 250) {
+        CONST.edgeLen = CONST.edgeLen / 2;
+        CONST.angle = CONST.angle / 2;
+      } else if (length < 500) {
+        CONST.edgeLen = CONST.edgeLen * length / 500;
+        CONST.angle = CONST.angle * length / 500;
+      }
+      // console.log(length);
+    },
+
+    // getRadian 返回以起点与X轴之间的夹角角度值
+    getRadian: function (beginPoint, stopPoint) {
+      this.angle = Math.atan2(stopPoint.y - beginPoint.y, stopPoint.x - beginPoint.x) / Math.PI * 180;
+      console.log(this.angle);
+      this.paraDef(50, 25);
+      this.dynArrowSize();
+    },
+
+    /// 获得箭头底边两个点
+    arrowCoord: function (beginPoint, stopPoint) {
+      polygonVertex[0] = beginPoint.x;
+      polygonVertex[1] = beginPoint.y;
+      polygonVertex[6] = stopPoint.x;
+      polygonVertex[7] = stopPoint.y;
+      this.getRadian(beginPoint, stopPoint);
+      polygonVertex[8] = stopPoint.x - CONST.edgeLen * Math.cos(Math.PI / 180 * (this.angle + CONST.angle));
+      polygonVertex[9] = stopPoint.y - CONST.edgeLen * Math.sin(Math.PI / 180 * (this.angle + CONST.angle));
+      polygonVertex[4] = stopPoint.x - CONST.edgeLen * Math.cos(Math.PI / 180 * (this.angle - CONST.angle));
+      polygonVertex[5] = stopPoint.y - CONST.edgeLen * Math.sin(Math.PI / 180 * (this.angle - CONST.angle));
+    },
+
+    // 获取另两个底边侧面点
+    sideCoord: function () {
+      var midpoint = {};
+      // midpoint.x = polygonVertex[6] - (CONST.edgeLen * Math.cos(this.angle * Math.PI / 180));
+      // midpoint.y = polygonVertex[7] - (CONST.edgeLen * Math.sin(this.angle * Math.PI / 180));
+      midpoint.x = (polygonVertex[4] + polygonVertex[8]) / 2;
+      midpoint.y = (polygonVertex[5] + polygonVertex[9]) / 2;
+      polygonVertex[2] = (polygonVertex[4] + midpoint.x) / 2;
+      polygonVertex[3] = (polygonVertex[5] + midpoint.y) / 2;
+      polygonVertex[10] = (polygonVertex[8] + midpoint.x) / 2;
+      polygonVertex[11] = (polygonVertex[9] + midpoint.y) / 2;
+    },
+
+    // 画箭头
+    drawArrow: function () {
+      const ctx = this.ctx;
+      ctx.fillStyle = 'red';
+      ctx.beginPath();
+      ctx.moveTo(polygonVertex[0], polygonVertex[1]);
+      ctx.lineTo(polygonVertex[2], polygonVertex[3]);
+      ctx.lineTo(polygonVertex[4], polygonVertex[5]);
+      ctx.lineTo(polygonVertex[6], polygonVertex[7]);
+      ctx.lineTo(polygonVertex[8], polygonVertex[9]);
+      ctx.lineTo(polygonVertex[10], polygonVertex[11]);
+      // ctx.lineTo(polygonVertex[0], polygonVertex[1]);
+      ctx.closePath();
+      ctx.fill();
+    },
+    paraDef (edgeLen, angle) {
+      CONST.edgeLen = edgeLen;
+      CONST.angle = angle;
     }
   },
   components: {
