@@ -1,11 +1,13 @@
 {
-  "name": "image-edit",
+  "name": "vue-image-graffiti",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "main": "dist/lib.common.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "lib":"vue-cli-service build --target lib --name lib ./packages/index.js"
   },
   "dependencies": {
     "core-js": "^3.6.5",

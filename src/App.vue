@@ -1,18 +1,12 @@
 <template>
   <div id="app">
-    <ImageGraffiti
-      width='800'
-      height='800'
-    />
   </div>
 </template>
 
 <script>
-import ImageGraffiti from '@/components/ImageGraffiti'
 export default {
   name: 'App',
   components: {
-    ImageGraffiti
   }
 }
 </script>
