@@ -233,8 +233,8 @@ export default {
       image.src = url;
     },
     lmousemove (e) {
-      const disX = e.clientX - this.canvas.offsetLeft;
-      const disY = e.clientY - this.canvas.offsetTop;
+      const disX = e.pageX - this.canvas.offsetLeft;
+      const disY = e.pageY - this.canvas.offsetTop;
       // 移动时设置画线的结束位置。并且显示
       this.ctx.lineTo(disX, disY) // 鼠标点下去的位置
       this.ctx.stroke()
@@ -246,8 +246,8 @@ export default {
     },
     amousemove (e) {
       this.drawSnapshot();
-      const disX = e.clientX - this.canvas.offsetLeft;
-      const disY = e.clientY - this.canvas.offsetTop;
+      const disX = e.pageX - this.canvas.offsetLeft;
+      const disY = e.pageY - this.canvas.offsetTop;
       stopPoint.x = disX;
       stopPoint.y = disY;
       // alert(stopPoint.x+"+"+stopPoint.y);
@@ -262,8 +262,8 @@ export default {
     },
     onmousedown (e) {
       // 计算鼠标在画布的距离
-      const disX = e.clientX - this.canvas.offsetLeft;
-      const disY = e.clientY - this.canvas.offsetTop;
+      const disX = e.pageX - this.canvas.offsetLeft;
+      const disY = e.pageY - this.canvas.offsetTop;
       this.recordSnapshot();
       if (this.mode === 'text') {
         if (this.textValue) {
