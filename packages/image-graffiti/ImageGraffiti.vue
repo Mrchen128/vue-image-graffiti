@@ -112,7 +112,7 @@ const beginPoint = {};
 const stopPoint = {};
 const polygonVertex = [];
 export default {
-  name: 'image-graffiti',
+  name: 'ImageGraffiti',
   data () {
     return {
       originImg: null,
