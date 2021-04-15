@@ -16,11 +16,14 @@
               'text-mode':mode === 'text',
             }"
         ></canvas>
-        <div class="add-img" v-if="!originImg">
-            <i class="el-icon-circle-plus-outline"></i>
+        <div
+            class="add-img"
+            v-if="!originImg"
+            title="选择本地图片"
+        >
+            <svg t="1618495757116" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10893" width="48" height="48"><path d="M778 183.8H247c-50.8 0-92 41.2-92 92v435c-1.2 4.8-1.2 9.4 0 14v23.6c0 50.8 41.2 92 92 92h531c50.8 0 92-41.2 92-92V275.8c0-50.8-41.2-92-92-92z m-531 56h531c19.8 0 36 16.2 36 36v349.4c-20.8-28.2-46-59-72.2-83.4-15.6-14.6-35-20.6-56.2-17.6-33.4 4.8-70 32.6-111.8 84.8-10 12.4-19 24.8-26.4 35.4-36.8-50.8-109.2-144.6-170.6-187.8-18.2-12.8-38.6-15.8-59.4-9-22.6 7.4-44.6 26.6-67 58.6-13 18.4-26.2 41.2-39.6 68V275.8c0.2-20 16.2-36 36.2-36z" p-id="10894" fill="#666666"></path><path d="M632 374.8a63 63 0 1 0 126 0 63 63 0 1 0-126 0z" p-id="10895" fill="#666666"></path></svg>
             <input
               type="file"
-              title="选择本地图片"
               @change="onChange"
               accept="image/*"
              >
@@ -47,16 +50,17 @@
                 active:mode === 'line'
               }"
             >
-                <i class="el-icon-edit"></i>
+                <svg t="1618494265859" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4950" width="16" height="16"><path d="M173.013333 882.56l72.106667-203.733333L741.546667 132.266667 789.333333 129.92l76.373334 69.333333 2.346666 47.786667-496.64 546.773333z m109.44-181.333333l-35.84 101.76 99.2-44.586667 478.72-526.933333v-12.586667l-50.773333-45.44h-12.373333z" p-id="4951" fill="#666666"></path><path d="M678.229333 202.026667l126.336 114.752-28.693333 31.573333-126.336-114.730667z" p-id="4952" fill="#666666"></path></svg>
                   <ul class="text-style-handle-list" v-if="mode ==='line'" @click.stop>
                     <li  @click="handLineWidth(1)">
-                      <i class="el-icon-circle-plus-outline"></i>
+                      <svg t="1618494661105" class="icon" viewBox="0 0 1318 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9501" width="16" height="16"><path d="M741.96894493 895.86428833l-89.12883988-217.48854506H317.69440381L232.08582869 895.86428833H164.38571167L446.0422962 200.63571166h74.87058778l288.82705529 695.22857666z m-402.82219204-267.39833244h292.3000683l-146.17366039-388.64663073zM737.68083754 513.40765239h321.91517757v42.12504211H737.68083754z" fill="#000" p-id="9502"></path><path d="M916.65910814 373.51849105v321.91517757h-42.1250421V373.51849105z" fill="#666666" p-id="9503"></path></svg>
                     </li>
                     <li  @click="handLineWidth(0)">
-                      <i class="el-icon-remove-outline"></i>
+                      <svg t="1618494689476" class="icon" viewBox="0 0 1318 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9839" width="16" height="16"><path d="M741.96894493 899.61428833l-89.12883989-217.48854506H317.69440381L232.08582869 899.61428833H164.38571167L446.0422962 204.38571166h74.87058778l288.8270553 695.22857666z m-402.82219204-267.39833244h292.3000683l-146.17366039-388.64663073zM737.68083754 550.0449541h321.91517757v42.12504212H737.68083754z" fill="#000" p-id="9840"></path></svg>
                     </li>
                     <li>
-                        <el-color-picker v-model="strokeStyle" show-alpha size="mini"></el-color-picker>
+                        <!-- <el-color-picker v-model="strokeStyle" show-alpha size="mini"></el-color-picker> -->
+                        <input type="color" v-model="strokeStyle">
                     </li>
                 </ul>
             </li>
@@ -68,20 +72,33 @@
                 active:mode === 'text'
               }"
             >
-            T
+              <svg t="1618494205109" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3335" width="16" height="16"><path d="M563.2 281.6V870.4a51.2 51.2 0 0 1-102.4 0V281.6H179.2a51.2 51.2 0 1 1 0-102.4h665.6a51.2 51.2 0 0 1 0 102.4H563.2z" fill="#666666" p-id="3336"></path></svg>
                <ul class="text-style-handle-list" v-if="mode ==='text'" @click.stop>
                  <li class="select">
-                     <el-select v-model="fontSize" placeholder="请选择" size="mini">
+                     <!-- <el-select v-model="fontSize" placeholder="请选择" size="mini">
                         <el-option
                           v-for="item in fontList"
                           :key="item.value"
                           :label="item.label"
-                          :value="item.value">
+                          :value="item.value"
+                          >
                         </el-option>
-                     </el-select>
+                     </el-select> -->
+                  <select v-model="fontSize">
+                      <option
+                          v-for="item in fontList"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value"
+                      >{{ item.value }}</option>
+                  </select>
                  </li>
                  <li>
-                    <el-color-picker v-model="fontBaseConfig.fillStyle" size="mini" show-alpha></el-color-picker>
+                    <!-- <el-color-picker v-model="fontBaseConfig.fillStyle" size="mini" show-alpha></el-color-picker> -->
+                        <input
+                          type="color"
+                          v-model="fontBaseConfig.fillStyle"
+                        >
                  </li>
                </ul>
             </li>
@@ -91,13 +108,13 @@
                 active:mode === 'arrow'
               }"
             >
-                <i class="el-icon-top-right"></i>
+                <svg t="1618494136364" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2136" width="16" height="16"><path d="M688.196267 356.272356 215.540622 175.069867c-18.386489-7.054222-36.443022 11.002311-29.3888 29.3888l181.202489 472.655644c5.893689 15.382756 25.691022 19.592533 37.341867 7.941689l62.828089-62.828089c8.886044-8.886044 23.290311-8.886044 32.176356 0l215.847822 215.847822c8.886044 8.886044 23.290311 8.886044 32.176356 0l102.172444-102.172444c8.886044-8.886044 8.886044-23.290311 0-32.176356L634.038044 487.901867c-8.886044-8.886044-8.886044-23.290311 0-32.176356l62.111289-62.111289C707.800178 381.963378 703.5904 362.177422 688.196267 356.272356z" p-id="2137" fill="#666666"></path></svg>
             </li>
              <li class="base-btn" title='撤销' @click="backHistory">
-                <i class="el-icon-back"></i>
+               <svg t="1618494309022" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5850" width="16" height="16"><path d="M588.468659 257.265591H123.316451L371.227243 58.55359a31.947267 31.947267 0 1 0-39.614611-49.837737l-319.472671 255.578137v11.501016a30.669376 30.669376 0 0 0 0 4.472617v3.194727a30.669376 30.669376 0 0 0 0 4.472617v11.501016l319.472671 255.578137a31.947267 31.947267 0 1 0 40.253556-49.837737L123.316451 321.160125h465.152208C792.292223 321.160125 958.418011 464.283881 958.418011 640.632795s-166.125789 319.47267-369.949352 319.472671H95.841801a31.947267 31.947267 0 0 0 0 63.894534h492.626858C830.628943 1024 1022.312545 852.123703 1022.312545 640.632795s-191.683602-383.367205-433.843886-383.367204z" fill="#666666" p-id="5851"></path></svg>
             </li>
             <li class="base-btn export" title='保存' @click='onExport'>
-                <i class="el-icon-download"></i>
+              <svg t="1618494349867" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6787" width="16" height="16"><path d="M916 293.6L730.4 108l-37.6-37.6c-4.1-4.1-9.7-6.4-15.6-6.4H166.5C109.9 64 64 109.9 64 166.4v691.1C64 914.1 109.9 960 166.4 960H857.5c56.6 0 102.4-45.9 102.4-102.4V346.7c0-5.8-2.3-11.4-6.4-15.6L916 293.6zM254.7 916V591.1c0-32.3 26.2-58.4 58.4-58.4h397.8c32.3 0 58.4 26.2 58.4 58.4V916H254.7zM916 857.6c0 32.3-26.2 58.4-58.4 58.4h-44.2V591.1c0-56.6-45.9-102.4-102.4-102.4H313.1c-56.6 0-102.4 45.9-102.4 102.4V916h-44.2c-32.3 0-58.4-26.2-58.4-58.4V166.4c0-32.3 26.2-58.4 58.4-58.4h44.2v150.6c0 56.6 45.9 102.4 102.4 102.4h324.6c12.2 0 22-9.8 22-22s-9.8-22-22-22H313.1c-32.3 0-58.4-26.2-58.4-58.4V108h404.4c5.8 0 11.4 2.3 15.6 6.4l234.9 234.9c4.1 4.1 6.4 9.7 6.4 15.6v492.7z" p-id="6788" fill="#666666"></path></svg>
             </li>
         </ul>
     </div>
@@ -119,7 +136,7 @@ export default {
       canvas: null,
       ctx: null,
       lineWidth: 1,
-      strokeStyle: 'rgba(255, 69, 0, 0.68)',
+      strokeStyle: '#ff0000',
       mode: '', // line text arrow
       textBoxRect: null,
       textValue: '',
@@ -139,7 +156,7 @@ export default {
       ],
       fontBaseConfig: {
         textBaseline: 'top',
-        fillStyle: 'rgba(255, 69, 0, 0.68)'
+        fillStyle: '#ff0000'
       },
       angle: '',
       history: [], // 历史记录列表
@@ -431,8 +448,8 @@ export default {
         justify-content: center;
         align-items: center;
         .add-img{
-          width: 50px;
-          height: 75px;
+          width: 80px;
+          height: 100px;
           border: 1px solid #ccc;
           border-radius: 5px;
           display: flex;
@@ -445,8 +462,8 @@ export default {
             position: absolute;
             left: 0;
             top: 0;
-            width: 50px;
-            height: 75px;
+            width: 80px;
+            height: 100px;
             opacity: 0;
             cursor: pointer;
           }
@@ -520,6 +537,14 @@ export default {
               }
               .select{
                 width: 60px;
+                display: flex;
+                select{
+                  width: 100%;
+                  outline: none;
+                  height: 100%;
+                  font-size: 16px;
+                  cursor: pointer;
+                }
               }
             }
         }
