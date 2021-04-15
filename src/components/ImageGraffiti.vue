@@ -10,7 +10,7 @@
             ref='can'
             :width='width'
             :height="height"
-            @mousedown='cmousedown'
+            @mousedown='onmousedown'
             v-show="originImg"
             :class="{
               'text-mode':mode === 'text',
@@ -33,7 +33,9 @@
           @input="textValueInput"
           :style='{
             left:textBoxRect.left+"px",
-            top:textBoxRect.top+"px"
+            top:textBoxRect.top+"px",
+            color:fontBaseConfig.fillStyle,
+            fontSize:fontSize
           }'
         ></div>
         <ul class="handle-list" v-show="originImg">
@@ -79,7 +81,7 @@
                      </el-select>
                  </li>
                  <li>
-                    <el-color-picker v-model="fontColor" size="mini" show-alpha></el-color-picker>
+                    <el-color-picker v-model="fontBaseConfig.fillStyle" size="mini" show-alpha></el-color-picker>
                  </li>
                </ul>
             </li>
@@ -91,7 +93,7 @@
             >
                 <i class="el-icon-top-right"></i>
             </li>
-             <li class="base-btn" title='撤销'>
+             <li class="base-btn" title='撤销' @click="backHistory">
                 <i class="el-icon-back"></i>
             </li>
             <li class="base-btn export" title='保存' @click='onExport'>
@@ -120,32 +122,29 @@ export default {
       mode: '', // line text arrow
       textBoxRect: null,
       textValue: '',
-      fontSize: 24,
+      fontSize: '24px',
       fontList: [
         {
           label: '小',
-          value: 16
+          value: '16px'
         },
         {
           label: '中',
-          value: 20
+          value: '20px'
         }, {
           label: '大',
-          value: 24
+          value: '24px'
         }
       ],
-      fontColor: 'rgba(255, 69, 0, 0.68)',
       fontBaseConfig: {
         textBaseline: 'top',
-        textAlign: 'left'
-      },
-      arrowInitPosi: { // 鼠标mousedown的位置坐标
-        x: 0,
-        y: 0
+        fillStyle: 'rgba(255, 69, 0, 0.68)'
       },
       angle: '',
-      history: [],
-      isDrawing: false
+      history: [], // 历史记录列表
+      currentHisory: 0, // 当前画布属于哪个history快照
+      isDrawing: false,
+      drawnSnapshot: null
     };
   },
   props: {
@@ -182,6 +181,35 @@ export default {
     }
   },
   methods: {
+    getImageData () {
+      return this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+    },
+    setImageData (drawnSnapshot) {
+      this.ctx.putImageData(drawnSnapshot, 0, 0);
+    },
+    recordSnapshot () {
+      this.drawnSnapshot = this.getImageData();
+    },
+    drawSnapshot () {
+      if (!this.drawnSnapshot) {
+        return false;
+      }
+      console.log('绘制快照');
+      this.setImageData(this.drawnSnapshot)
+      return true;
+    },
+    pushHistory () {
+      this.history.push(this.getImageData());
+      const len = this.history.length;
+      this.currentHisory = len - 1;
+    },
+    backHistory () {
+      if (this.currentHisory > 0) {
+        this.currentHisory -= 1;
+      }
+      this.history.length = this.currentHisory + 1;
+      this.setImageData(this.history[this.currentHisory])
+    },
     onChange (e) {
       const target = e.target;
       const file = target.files[0];
@@ -199,6 +227,7 @@ export default {
       const image = new Image();
       image.onload = () => {
         this.ctx.drawImage(image, 0, 0, this.width, this.height);
+        this.pushHistory();
       }
       image.src = url;
     },
@@ -210,12 +239,12 @@ export default {
       this.ctx.stroke()
     },
     lmouseup () {
+      this.pushHistory();
       document.removeEventListener('mousemove', this.lmousemove);
       document.removeEventListener('mouseup', this.lmouseup);
     },
     amousemove (e) {
-    },
-    amouseup (e) {
+      this.drawSnapshot();
       const disX = e.clientX - this.canvas.offsetLeft;
       const disY = e.clientY - this.canvas.offsetTop;
       stopPoint.x = disX;
@@ -224,13 +253,17 @@ export default {
       this.arrowCoord(beginPoint, stopPoint);
       this.sideCoord();
       this.drawArrow();
+    },
+    amouseup (e) {
+      this.pushHistory();
       document.removeEventListener('mousemove', this.amousemove);
       document.removeEventListener('mouseup', this.amouseup);
     },
-    cmousedown (e) {
+    onmousedown (e) {
       // 计算鼠标在画布的距离
       const disX = e.clientX - this.canvas.offsetLeft;
       const disY = e.clientY - this.canvas.offsetTop;
+      this.recordSnapshot();
       if (this.mode === 'text') {
         if (this.textValue) {
           this.drawText()
@@ -263,8 +296,7 @@ export default {
     },
     drawText () {
       this.ctx.moveTo(this.textBoxRect.left, this.textBoxRect.top);
-      this.ctx.fillStyle = this.fontColor;
-      this.ctx.font = this.fontSize + 'px' + ' 微软雅黑';
+      this.ctx.font = this.fontSize + ' 微软雅黑';
       const fontConfig = Object.entries(this.fontBaseConfig);
       fontConfig.forEach(([key, value]) => {
         this.ctx[key] = value;
@@ -273,6 +305,7 @@ export default {
       this.textBoxRect = null;
       this.mode = '';
       this.textValue = '';
+      this.pushHistory();
     },
     handLineWidth (type) {
       if (type === 1) {
