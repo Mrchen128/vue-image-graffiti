@@ -199,6 +199,15 @@ export default {
     }
   },
   methods: {
+    getCliectRect () {
+      return this.canvas.getBoundingClientRect();
+    },
+    getDisX (event) {
+      return event.pageX - this.getCliectRect().left - (document.documentElement.scrollLeft || document.body.scrollLeft)
+    },
+    getDisY (event) {
+      return event.pageY - this.getCliectRect().top - (document.documentElement.scrollTop || document.body.scrollTop)
+    },
     getImageData () {
       return this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     },
@@ -250,8 +259,8 @@ export default {
       image.src = url;
     },
     lmousemove (e) {
-      const disX = e.pageX - this.canvas.offsetLeft;
-      const disY = e.pageY - this.canvas.offsetTop;
+      const disX = this.getDisX(e);
+      const disY = this.getDisY(e);
       // 移动时设置画线的结束位置。并且显示
       this.ctx.lineTo(disX, disY) // 鼠标点下去的位置
       this.ctx.stroke()
@@ -263,8 +272,8 @@ export default {
     },
     amousemove (e) {
       this.drawSnapshot();
-      const disX = e.pageX - this.canvas.offsetLeft;
-      const disY = e.pageY - this.canvas.offsetTop;
+      const disX = this.getDisX(e);
+      const disY = this.getDisY(e);
       stopPoint.x = disX;
       stopPoint.y = disY;
       // alert(stopPoint.x+"+"+stopPoint.y);
@@ -278,9 +287,10 @@ export default {
       document.removeEventListener('mouseup', this.amouseup);
     },
     onmousedown (e) {
+      if (this.mode === '') return;
       // 计算鼠标在画布的距离
-      const disX = e.pageX - this.canvas.offsetLeft;
-      const disY = e.pageY - this.canvas.offsetTop;
+      const disX = this.getDisX(e);
+      const disY = this.getDisY(e);
       this.recordSnapshot();
       if (this.mode === 'text') {
         if (this.textValue) {
@@ -442,6 +452,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  ul,li{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    list-style: none;
+  }
+  canvas{
+    display: block;
+  }
     .image-edit-wrap{
         position: relative;
         display: flex;
