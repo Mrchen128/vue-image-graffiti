@@ -1,9 +1,10 @@
 {
   "name": "vue-image-graffiti",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "private": false,
   "main": "dist/lib.common.js",
   "style": "dist/lib.css",
+  "repository": "https://github.com/Mrchen128/vue-image-graffiti.git",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
